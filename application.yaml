@@ -1,0 +1,11 @@
+APP_NAME: "server"
+APP_PORT: "8000"
+
+DB_DRIVER: "postgres"
+DB_HOST: "localhost"
+DB_PORT: 5432
+DB_NAME: "Library_Management"
+DB_USER: "postgres"
+DB_PASSWORD: "admin123"
+SECRETKEY: "qwertiuyt"
+

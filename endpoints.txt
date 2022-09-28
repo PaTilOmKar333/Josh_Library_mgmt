@@ -1,0 +1,26 @@
+1.Login
+/login/                             -POST   --with respective of role it fill redirect 
+
+2.User          
+/user/                              -GET    --admin can see all users --end users can see only self information
+/user/{user_id}                     -GET    --admin can see any user and enduser can see his information
+/user/{email}/                      -GET    --Get user by email
+/user/                              -POST   --Newuser
+/user/{email}/                      -PUT    --update name and password
+/user/{user_id}                     -DELETE --delete user
+/user/{user_id}/book/{book_id}      -POST   --Issue book
+
+3.Books                 
+/book/                              -GET    --admin and end user can see all books
+/book/{book_id}                     -DELETE --delete book
+
+8.BookReport            
+/bookreport/                        -GET    --all book reports for admin and only assigned book report for enduser
+/bookreport/{bookid}                -GET    --get perticular book report
+
+
+
+#1. user and book should also have a DELETE request
+#2. GET /user/<user_id> : gets user details (any for admin, only logged in user for enduser)
+#3. issue book to user: POST /user/<user_id>/book/<book_id> 
+#4. get book report: GET /user/<user_id>/book/
