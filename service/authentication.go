@@ -28,9 +28,9 @@ func (j *JwtToken) GenerateToken(uID int, email, role string) (string, error) {
 
 	var mySigningKey = []byte(config.SecretKey())
 
-	claims.UserID = uID
+	claims.ID = uID
 	claims.Email = email
-	claims.Role = role
+	claims.RoleType = role
 	claims.StandardClaims = jwt.StandardClaims{
 		ExpiresAt: time.Now().Add(time.Minute * 90).Unix(),
 	}

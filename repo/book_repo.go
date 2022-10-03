@@ -16,11 +16,11 @@ import (
 )
 
 type BookRepoInterface interface {
-	ListBooks() (bookLists []models.BookList, err error)
-	CreateBook(book models.Book, createdBy, updatedBy string) (createdBook models.CreateBook, err error)
+	ListBooks() (bookLists []models.Book, err error)
+	CreateBook(book models.Book, createdBy, updatedBy string) (createdBook models.Book, err error)
 	// DeleteBook(bid int) (id int, err error)
 	DeleteBook(bid int) (id int, bookReportLists []models.BookReportList, err error)
-	UpdateBookWithID(bid int, book models.Book, updatedBy string) (updatedBook models.UpdateBook, err error)
+	UpdateBookWithID(bid int, book models.Book, updatedBy string) (updatedBook models.Book, err error)
 }
 
 type bookRepo struct {
@@ -34,40 +34,24 @@ func InitBookRepo() BookRepoInterface {
 	return &br
 }
 
-func (br *bookRepo) ListBooks() (bookLists []models.BookList, err error) {
-	var books []models.Book
-	//var book models.Book
-
+func (br *bookRepo) ListBooks() (bookLists []models.Book, err error) {
 	sqlStatement1 := `select * from books`
 
-	err = br.db.Select(&books, sqlStatement1)
+	err = br.db.Select(&bookLists, sqlStatement1)
 	if err != nil {
 		log.Println(err)
 		err = errors.New("sorry for inconvenience, there is error in fetching list of books. we are working on this")
 		return
 	}
-	for _, book := range books {
-		var booksStatus models.BookStatus
-		sqlStatement2 := `select * from books_status where status_id=$1`
-		err = br.db.Get(&booksStatus, sqlStatement2, book.BookStatusID)
-		if err != nil {
-			log.Println(err)
-			err = errors.New("sorry for inconvenience, there is error in fetching list of books. we are working on this")
-			return
-		}
-		bookList := models.BookToBookList(book, booksStatus)
-		bookLists = append(bookLists, bookList)
-	}
 
 	return
 }
 
-func (br *bookRepo) CreateBook(book models.Book, createdBy, updatedBy string) (createdBook models.CreateBook, err error) {
-	//var createdBook models.Book
+func (br *bookRepo) CreateBook(book models.Book, createdBy, updatedBy string) (createdBook models.Book, err error) {
 
-	sqlStatement := `INSERT INTO books( book_name, author_name, available_book_copies, Status_id, price, category, created_by, created_at, updated_by, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING book_id`
+	sqlStatement := `INSERT INTO books( book_name, Status, price, category, created_by, created_at, updated_by, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING book_id`
 	//var id int
-	err = br.db.Get(&book, sqlStatement, book.BookName, book.AuthorName, book.AvailableCopies, 1, book.Price, book.Category, createdBy, time.Now().Format("01-02-2006"), updatedBy, time.Now().Format("01-02-2006"))
+	err = br.db.Get(&book, sqlStatement, book.BookName, "available", book.Price, book.Category, createdBy, time.Now().Format("01-02-2006"), updatedBy, time.Now().Format("01-02-2006"))
 	if err != nil {
 		if err != nil {
 
@@ -181,7 +165,6 @@ func (br *bookRepo) DeleteBook(bid int) (id int, bookReportLists []models.BookRe
 
 			bookReportList := models.BookReportToBookReportList(bookReport, book, user)
 			bookReportLists = append(bookReportLists, bookReportList)
-			// err = errors.New("book deleted successfully")
 
 		}
 
@@ -191,7 +174,7 @@ func (br *bookRepo) DeleteBook(bid int) (id int, bookReportLists []models.BookRe
 
 }
 
-func (br *bookRepo) UpdateBookWithID(bid int, book models.Book, updatedBy string) (updatedBook models.UpdateBook, err error) {
+func (br *bookRepo) UpdateBookWithID(bid int, book models.Book, updatedBy string) (updatedBook models.Book, err error) {
 	var oldbook models.Book
 
 	sqlStatement1 := `select * FROM books WHERE book_id=$1`
@@ -236,6 +219,5 @@ func (br *bookRepo) UpdateBookWithID(bid int, book models.Book, updatedBy string
 		return
 	}
 
-	updatedBook = models.UpdateBookMapping(updateBook)
 	return
 }

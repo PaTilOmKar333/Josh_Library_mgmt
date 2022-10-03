@@ -9,10 +9,10 @@ import (
 )
 
 type BookServiceInterface interface {
-	ListBooks() (bookslist []models.BookList, err error)
-	CreateBook(ctx context.Context, book models.Book) (createdBook models.CreateBook, err error)
+	ListBooks() (bookslist []models.Book, err error)
+	CreateBook(ctx context.Context, book models.Book) (createdBook models.Book, err error)
 	DeleteBook(bid int) (id int, bookReportLists []models.BookReportList, err error)
-	UpdateBookWithID(ctx context.Context, bid int, book models.Book) (updateBook models.UpdateBook, err error)
+	UpdateBookWithID(ctx context.Context, bid int, book models.Book) (updateBook models.Book, err error)
 }
 
 type bookService struct {
@@ -28,7 +28,7 @@ func InitBookService(r repo.BookRepoInterface) BookServiceInterface {
 	}
 }
 
-func (bs *bookService) ListBooks() (bookslist []models.BookList, err error) {
+func (bs *bookService) ListBooks() (bookslist []models.Book, err error) {
 	bookslist, err = bs.repo.ListBooks()
 	//fmt.Println("service layer: ", users)
 	if err != nil {
@@ -37,7 +37,7 @@ func (bs *bookService) ListBooks() (bookslist []models.BookList, err error) {
 	return
 }
 
-func (bs *bookService) CreateBook(ctx context.Context, book models.Book) (createdBook models.CreateBook, err error) {
+func (bs *bookService) CreateBook(ctx context.Context, book models.Book) (createdBook models.Book, err error) {
 	val, _ := ctx.Value("ClaimsToVerify").(*models.Claims)
 	createdBy := val.Email
 	updatedBy := val.Email
@@ -62,7 +62,7 @@ func (bs *bookService) DeleteBook(bid int) (id int, bookReportLists []models.Boo
 	return
 }
 
-func (bs *bookService) UpdateBookWithID(ctx context.Context, bid int, book models.Book) (updateBook models.UpdateBook, err error) {
+func (bs *bookService) UpdateBookWithID(ctx context.Context, bid int, book models.Book) (updateBook models.Book, err error) {
 	val, _ := ctx.Value("ClaimsToVerify").(*models.Claims)
 	updatedBy := val.Email
 	updateBook, err = bs.repo.UpdateBookWithID(bid, book, updatedBy)

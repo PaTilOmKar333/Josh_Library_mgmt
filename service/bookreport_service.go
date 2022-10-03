@@ -44,7 +44,7 @@ func (brs *bookreportService) IssueBook(ctx context.Context, uid, bid int) (issu
 func (brs *bookreportService) GetBookReport(ctx context.Context, uid int) (bookReportLists []models.BookReportList, err error) {
 
 	val, _ := ctx.Value("ClaimsToVerify").(*models.Claims)
-	if val.UserID == uid || val.Role == "admin" || val.Role == "superadmin" {
+	if val.ID == uid || val.RoleType == "admin" || val.RoleType == "superadmin" {
 		bookReportLists, err = brs.repo.GetBookReport(uid)
 		if err != nil {
 			return

@@ -36,7 +36,7 @@ func (brr *bookreportRepo) IssueBook(uid, bid int, issuedBy string) (issueBook m
 	var selectuser models.User
 	var id int
 
-	sqlStatement1 := `select user_id, first_name, last_name, age, email, role_id, password, address FROM users where user_id=$1 `
+	sqlStatement1 := `select id FROM users where user_id=$1 `
 	err = brr.db.Get(&selectuser, sqlStatement1, uid)
 
 	if err == sql.ErrNoRows {
@@ -49,7 +49,7 @@ func (brr *bookreportRepo) IssueBook(uid, bid int, issuedBy string) (issueBook m
 		return
 	}
 
-	sqlStatement2 := `select book_id,available_book_copies from books WHERE book_id=$1`
+	sqlStatement2 := `select book_id from books WHERE book_id=$1`
 	err = brr.db.Get(&book, sqlStatement2, bid)
 	if err == sql.ErrNoRows {
 		log.Println(err)
@@ -60,45 +60,26 @@ func (brr *bookreportRepo) IssueBook(uid, bid int, issuedBy string) (issueBook m
 		err = errors.New("sorry for inconvenience, there is error in issueing book. we are working on this")
 		return
 	}
-	availabaleCopies := book.AvailableCopies
-	if availabaleCopies < 1 {
-		err = errors.New("sorry for inconvenience, book is unavailable now")
-		return
-	}
-	//select bkreport_id from book_report WHERE book_id=25 and user_id=4 and actual_retun_date IS NULL
 
-	sqlStatement6 := `select bkreport_id from book_report WHERE book_id=$1 and user_id=$2 and actual_retun_date IS NULL`
+	sqlStatement6 := `select bkreport_id from book_report WHERE book_id=$1 and user_id=$2 `
 	err = brr.db.Get(&checkbookreport, sqlStatement6, bid, uid)
 	if err == sql.ErrNoRows {
-		if availabaleCopies >= 1 {
-			sqlStatement3 := `INSERT INTO book_report(book_id, user_id, issue_date, return_date, issued_by) VALUES ($1, $2, $3, $4, $5) RETURNING bkreport_id`
+		sqlStatement3 := `INSERT INTO book_report(book_id, user_id, created_at, issued_by) VALUES ($1, $2, $3, $4) RETURNING bkreport_id`
 
-			err = brr.db.Get(&bookreport, sqlStatement3, bid, uid, time.Now().Format("01-02-2006"), time.Now().AddDate(0, 0, 7), issuedBy)
-			if err != nil {
-				log.Println(err)
-				err = errors.New("sorry for inconvenience, there is error in issueing book. we are working on this")
-				return
-			}
-			id = bookreport.BookReportID
+		err = brr.db.Get(&bookreport, sqlStatement3, bid, uid, time.Now().Format("01-02-2006"), issuedBy)
+		if err != nil {
+			log.Println(err)
+			err = errors.New("sorry for inconvenience, there is error in issueing book. we are working on this")
+			return
+		}
+		id = bookreport.BookReportID
 
-			sqlStatement4 := `UPDATE books SET available_book_copies=$2 WHERE book_id=$1 RETURNING book_id`
-			err = brr.db.Get(&book, sqlStatement4, bid, availabaleCopies-1)
-			if err != nil {
-				log.Println(err)
-				err = errors.New("sorry for inconvenience, there is error in issueing book. we are working on this")
-				return
-			}
-			availabaleCopies = availabaleCopies - 1
-
-			if availabaleCopies == 0 {
-				sqlStatement5 := `UPDATE books SET status_id=2 WHERE book_id=$1 RETURNING book_id`
-				err = brr.db.Get(&book, sqlStatement5, bid)
-				if err != nil {
-					log.Println(err)
-					err = errors.New("sorry for inconvenience, there is error in issueing book. we are working on this")
-					return
-				}
-			}
+		sqlStatement4 := `UPDATE books SET status=$2 WHERE book_id=$1 RETURNING book_id`
+		err = brr.db.Get(&book, sqlStatement4, bid, "unavailable")
+		if err != nil {
+			log.Println(err)
+			err = errors.New("sorry for inconvenience, there is error in issueing book. we are working on this")
+			return
 		}
 
 	} else if err != nil {
@@ -119,7 +100,7 @@ func (brr *bookreportRepo) IssueBook(uid, bid int, issuedBy string) (issueBook m
 	brr.db.Get(&selectBook, selectBookQuery, selectBookReport.BookID)
 
 	var selectUser models.User
-	selectUserQuery := `SELECT * FROM users where user_id=$1`
+	selectUserQuery := `SELECT * FROM users where id=$1`
 	brr.db.Get(&selectUser, selectUserQuery, selectBookReport.UserID)
 
 	issueBook = models.IssueBookMapping(selectBookReport, selectBook, selectUser)
@@ -151,7 +132,7 @@ func (brr *bookreportRepo) GetAllBookReport() (bookReportLists []models.BookRepo
 			return
 		}
 
-		sqlStatement3 := `select * from users where user_id=$1`
+		sqlStatement3 := `select * from users where id=$1`
 		err = brr.db.Get(&user, sqlStatement3, bookReport.UserID)
 		if err != nil {
 			log.Println(err)
@@ -189,7 +170,7 @@ func (brr *bookreportRepo) GetBookReport(uid int) (bookReportLists []models.Book
 			return
 		}
 
-		sqlStatement3 := `select * from users where user_id=$1`
+		sqlStatement3 := `select * from users where id=$1`
 		err = brr.db.Get(&user, sqlStatement3, bookReport.UserID)
 		if err != nil {
 			log.Println(err)
@@ -212,7 +193,7 @@ func (brr *bookreportRepo) ReturnBook(uid, bid int) (ReturnBookReport models.Boo
 	var selectuser models.User
 	var selectbook models.Book
 
-	sqlStatement1 := `select user_id FROM users where user_id=$1 `
+	sqlStatement1 := `select id FROM users where id=$1 `
 	err = brr.db.Get(&selectuser, sqlStatement1, uid)
 
 	if err == sql.ErrNoRows {
@@ -225,7 +206,7 @@ func (brr *bookreportRepo) ReturnBook(uid, bid int) (ReturnBookReport models.Boo
 		return
 	}
 
-	sqlStatement2 := `select available_book_copies from books WHERE book_id=$1`
+	sqlStatement2 := `select status from books WHERE book_id=$1`
 	err = brr.db.Get(&selectbook, sqlStatement2, bid)
 	if err == sql.ErrNoRows {
 		log.Println(err)
@@ -237,8 +218,8 @@ func (brr *bookreportRepo) ReturnBook(uid, bid int) (ReturnBookReport models.Boo
 		return
 	}
 
-	sqlStatement8 := `select bkreport_id from book_report WHERE book_id=$1 and user_id=$2 and actual_retun_date IS NULL`
-	err = brr.db.Get(&bookReport2, sqlStatement8, bid, uid)
+	sqlStatement3 := `select bkreport_id from book_report WHERE book_id=$1 and user_id=$2`
+	err = brr.db.Get(&bookReport2, sqlStatement3, bid, uid)
 	if err == sql.ErrNoRows {
 		log.Println(err)
 		err = errors.New("there is no book pending from your side")
@@ -249,8 +230,8 @@ func (brr *bookreportRepo) ReturnBook(uid, bid int) (ReturnBookReport models.Boo
 		return
 	}
 
-	sqlStatement3 := `UPDATE book_report SET actual_retun_date=$3 WHERE book_id=$1 AND user_id=$2 RETURNING bkreport_id`
-	err = brr.db.Get(&bookReport1, sqlStatement3, bid, uid, time.Now().Format("01-02-2006"))
+	sqlStatement4 := `UPDATE book_report SET return_date=$3 WHERE book_id=$1 AND user_id=$2 RETURNING bkreport_id`
+	err = brr.db.Get(&bookReport1, sqlStatement4, bid, uid, time.Now().Format("01-02-2006"))
 	if err != nil {
 		log.Println(err)
 		err = errors.New("sorry for inconvenience, there is error in returning book. we are working on this")
@@ -258,30 +239,12 @@ func (brr *bookreportRepo) ReturnBook(uid, bid int) (ReturnBookReport models.Boo
 	}
 	bookReportID := bookReport1.BookReportID
 
-	sqlStatement4 := `select book_name,available_book_copies from books WHERE book_id=$1`
-	err = brr.db.Get(&book, sqlStatement4, bid)
+	sqlStatement5 := `UPDATE books SET status=$2 WHERE book_id=$1 RETURNING book_id`
+	err = brr.db.Get(&book, sqlStatement5, bid, "available")
 	if err != nil {
 		log.Println(err)
 		err = errors.New("sorry for inconvenience, there is error in returning book. we are working on this")
 		return
-	}
-	availabaleCopies := book.AvailableCopies
-	if availabaleCopies == 0 {
-		sqlStatement8 := `UPDATE books SET available_book_copies=$2,status_id=$3 WHERE book_id=$1 RETURNING book_id`
-		err = brr.db.Get(&book, sqlStatement8, bid, availabaleCopies+1, 1)
-		if err != nil {
-			log.Println(err)
-			err = errors.New("sorry for inconvenience, there is error in returning book. we are working on this")
-			return
-		}
-	} else if availabaleCopies >= 1 {
-		sqlStatement5 := `UPDATE books SET available_book_copies=$2 WHERE book_id=$1 RETURNING book_id`
-		err = brr.db.Get(&book, sqlStatement5, bid, availabaleCopies+1)
-		if err != nil {
-			log.Println(err)
-			err = errors.New("sorry for inconvenience, there is error in returning book. we are working on this")
-			return
-		}
 	}
 
 	sqlStatement6 := `select first_name from users WHERE user_id=$1`

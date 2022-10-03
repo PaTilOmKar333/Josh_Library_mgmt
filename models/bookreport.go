@@ -5,13 +5,12 @@ import (
 )
 
 type BookReport struct {
-	BookReportID     int        `json:"book_report_id" db:"bkreport_id"`
-	BookID           int        `json:"book_id" db:"book_id"`
-	UserID           int        `json:"user_id" db:"user_id"`
-	IssueDate        time.Time  `json:"issue_date" db:"issue_date"`
-	ReturnDate       time.Time  `json:"return_date" db:"return_date"`
-	ActualReturnDate *time.Time `json:"actual_return_date,omitempty" db:"actual_retun_date"`
-	IssuedBy         string     `json:"issued_by,omitempty" db:"issued_by"`
+	BookReportID int        `json:"book_report_id" db:"bkreport_id"`
+	BookID       int        `json:"book_id" db:"book_id"`
+	UserID       int        `json:"user_id" db:"user_id"`
+	ReturnDate   *time.Time `json:"return_date" db:"return_date"`
+	IssuedBy     string     `json:"issued_by,omitempty" db:"issued_by"`
+	CreatedAt    *time.Time `json:"created_at,omitempty" db:"created_at"`
 }
 
 type BookReportResponse struct {
@@ -38,16 +37,15 @@ type IssueBookResponse struct {
 }
 
 type BookReportList struct {
-	BookReportID     int       `json:"Id,omitempty"`
-	BookName         string    `json:"name,omitempty"`
-	Price            int       `json:"prize,omitempty"`
-	Category         string    `json:"category,omitempty"`
-	BookStatus       string    `json:"status,omitempty"`
-	UserName         string    `json:"issued_to,omitempty"`
-	IssuedBy         string    `json:"issued_by,omitempty"`
-	ReturnDate       time.Time `json:"return_date,omitempty"`
-	IssueDate        time.Time `json:"issue_date,omitempty"`
-	ActualReturnDate time.Time `json:"actual_return_date,omitempty"`
+	BookReportID int        `json:"Id,omitempty"`
+	BookName     string     `json:"name,omitempty"`
+	Price        int        `json:"prize,omitempty"`
+	Category     string     `json:"category,omitempty"`
+	BookStatus   string     `json:"status,omitempty"`
+	UserName     string     `json:"issued_to,omitempty"`
+	IssuedBy     string     `json:"issued_by,omitempty"`
+	ReturnDate   *time.Time `json:"return_date,omitempty"`
+	IssueDate    *time.Time `json:"issue_date,omitempty"`
 }
 
 type BookReportListResponse struct {

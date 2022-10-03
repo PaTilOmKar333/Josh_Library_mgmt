@@ -51,7 +51,7 @@ func IsAuthorized(authorizedRole []string, authToken service.AuthTokenInterface,
 			}
 		}
 
-		roleFromClaims := claimss.Role
+		roleFromClaims := claimss.RoleType
 		for _, val := range authorizedRole {
 			if val == roleFromClaims {
 				handler.ServeHTTP(w, r.WithContext(context.WithValue(r.Context(), "ClaimsToVerify", claimss)))

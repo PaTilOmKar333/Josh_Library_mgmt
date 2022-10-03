@@ -8,14 +8,11 @@ import (
 
 // User struct declaration
 type User struct {
-	User_ID   int        `json:"u_id ,omitempty" db:"user_id"`
-	FirstName string     `json:"u_firstname,omitempty" db:"first_name"`
-	LastName  string     `json:"u_lastname,omitempty" db:"last_name"`
-	Age       int        `json:"age,omitempty" db:"age"`
+	ID        int        `json:"id,omitempty" db:"id"`
+	Name      string     `json:"name,omitempty" db:"name"`
 	Email     string     `json:"email,omitempty" db:"email"`
 	Password  string     `json:"password,omitempty" db:"password"`
-	Address   string     `json:"address,omitempty" db:"address"`
-	Role_ID   int        `json:"role_id,omitempty" db:"role_id"`
+	RoleType  string     `json:"role_type,omitempty" db:"role_type"`
 	CreatedBy string     `json:"created_by,omitempty" db:"created_by"`
 	CreatedAT *time.Time `json:"created_at,omitempty" db:"created_at"`
 	UpdatedBy string     `json:"updated_by,omitempty" db:"updated_by"`
@@ -23,85 +20,24 @@ type User struct {
 }
 
 type UserAuth struct {
-	User_ID   int    `json:"u_id"`
-	FirstName string `json:"u_firstname"`
-	LastName  string `json:"u_lastname"`
-	Age       int    `json:"age"`
-	Email     string `json:"email"`
-	Password  string `json:"password,omitempty"`
-	Address   string `json:"address"`
-	Role      string `json:"role"`
-}
-
-// type UpdateUser struct {
-// 	OldFirstName string `json:"old_firstname,omitempty"`
-// 	OldLastName  string `json:"old_lastname,omitempty"`
-// 	OldPassword  string `json:"old_password,omitempty"`
-// 	NewFirstName string `json:"new_firstname,omitempty"`
-// 	NewLastName  string `json:"new_lastname,omitempty"`
-// 	NewPassword  string `json:"new_password,omitempty"`
-// }
-
-type UpdateUser struct {
-	User_ID   int        `json:"id ,omitempty" db:"user_id"`
-	FirstName string     `json:"firstname,omitempty" db:"first_name"`
-	LastName  string     `json:"lastname,omitempty" db:"last_name"`
-	Age       int        `json:"age,omitempty" db:"age"`
-	Email     string     `json:"email,omitempty" db:"email"`
-	Password  string     `json:"password,omitempty" db:"password"`
-	Address   string     `json:"address,omitempty" db:"address"`
-	Role      string     `json:"role_type,omitempty" db:"role_id"`
-	CreatedBy string     `json:"created_by,omitempty" db:"created_by"`
-	CreatedAT *time.Time `json:"created_at,omitempty" db:"created_at"`
-	UpdatedBy string     `json:"updated_by,omitempty" db:"updated_by"`
-	UpdatedAt *time.Time `json:"updated_at,omitempty" db:"updated_at"`
-}
-
-type CreateUser struct {
-	User_ID   int        `json:"id ,omitempty" db:"user_id"`
-	FirstName string     `json:"firstname,omitempty" db:"first_name"`
-	LastName  string     `json:"lastname,omitempty" db:"last_name"`
-	Age       int        `json:"age,omitempty" db:"age"`
-	Email     string     `json:"email,omitempty" db:"email"`
-	Password  string     `json:"password,omitempty" db:"password"`
-	Address   string     `json:"address,omitempty" db:"address"`
-	Role      string     `json:"role_type,omitempty" db:"role_id"`
-	CreatedBy string     `json:"createdb_y,omitempty" db:"created_by"`
-	CreatedAT *time.Time `json:"created_at,omitempty" db:"created_at"`
-	UpdatedBy string     `json:"updated_by,omitempty" db:"updated_by"`
-	UpdatedAt *time.Time `json:"updated_at,omitempty" db:"updated_at"`
-}
-
-type UserRole struct {
-	RoleID int    `json:"role_id" db:"role_id"`
-	Role   string `json:"role_type" db:"role_name"`
-}
-
-type UserList struct {
-	User_ID   int        `json:"id"`
-	FirstName string     `json:"firstname"`
-	LastName  string     `json:"lastname"`
-	Age       int        `json:"age"`
-	Email     string     `json:"email"`
-	Address   string     `json:"address"`
-	Role      string     `json:"role_type"`
-	CreatedBy string     `json:"createdb_y,omitempty"`
-	CreatedAT *time.Time `json:"created_at,omitempty"`
-	UpdatedBy string     `json:"updated_by,omitempty"`
-	UpdatedAt *time.Time `json:"updated_at,omitempty"`
+	ID       int    `json:"id ,omitempty" db:"id"`
+	Name     string `json:"name,omitempty" db:"name"`
+	Email    string `json:"email,omitempty" db:"email"`
+	Password string `json:"password,omitempty" db:"password"`
+	RoleType string `json:"role_type,omitempty" db:"role_type"`
 }
 
 type Authentication struct {
-	UserID   int    `json:"id"`
+	ID       int    `json:"id ,omitempty"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
-	Role     string `json:"role_type"`
+	RoleType string `json:"role_type,omitempty"`
 }
 
 type Claims struct {
-	UserID int    `json:"id"`
-	Role   string `json:"role_type"`
-	Email  string `json:"email"`
+	ID       int    `json:"id"`
+	RoleType string `json:"role_type"`
+	Email    string `json:"email"`
 	jwt.StandardClaims
 }
 
@@ -116,42 +52,27 @@ type TokenResponse struct {
 }
 
 type CreateUserResponse struct {
-	StatusCode int        `json:"error_code"`
-	Message    string     `json:"error_description"`
-	CreateUser CreateUser `json:"data,omitempty"`
+	StatusCode int    `json:"error_code"`
+	Message    string `json:"error_description"`
+	CreateUser User   `json:"data,omitempty"`
 }
 
 type UserListResponse struct {
-	StatusCode int        `json:"error_code"`
-	Message    string     `json:"error_description"`
-	UserList   []UserList `json:"data,omitempty"`
+	StatusCode int    `json:"error_code"`
+	Message    string `json:"error_description"`
+	UserList   []User `json:"data,omitempty"`
 }
 
 type UpdateUserResponse struct {
-	StatusCode  int        `json:"error_code"`
-	Message     string     `json:"error_description"`
-	UpdatedUser UpdateUser `json:"data,omitempty"`
-}
-
-type GetUser struct {
-	User_ID   int        `json:"id ,omitempty" db:"user_id"`
-	FirstName string     `json:"firstname,omitempty" db:"first_name"`
-	LastName  string     `json:"lastname,omitempty" db:"last_name"`
-	Age       int        `json:"age,omitempty" db:"age"`
-	Email     string     `json:"email,omitempty" db:"email"`
-	Password  string     `json:"password,omitempty" db:"password"`
-	Address   string     `json:"address,omitempty" db:"address"`
-	Role      string     `json:"role_type,omitempty" db:"role_id"`
-	CreatedBy string     `json:"createdb_y,omitempty" db:"created_by"`
-	CreatedAT *time.Time `json:"created_at,omitempty" db:"created_at"`
-	UpdatedBy string     `json:"updated_by,omitempty" db:"updated_by"`
-	UpdatedAt *time.Time `json:"updated_at,omitempty" db:"updated_at"`
+	StatusCode  int    `json:"error_code"`
+	Message     string `json:"error_description"`
+	UpdatedUser User   `json:"data,omitempty"`
 }
 
 type GetUserResponse struct {
-	StatusCode int     `json:"error_code"`
-	Message    string  `json:"error_description"`
-	GotUser    GetUser `json:"data,omitempty"`
+	StatusCode int    `json:"error_code"`
+	Message    string `json:"error_description"`
+	GotUser    User   `json:"data,omitempty"`
 }
 
 type AuthenticationResponse struct {
@@ -159,15 +80,9 @@ type AuthenticationResponse struct {
 	Message    string `json:"message"`
 }
 
-type DeleteUser struct {
-	UserID    int    `json:"id,omitempty" db:"user_id"`
-	FirstName string `json:"firstname,omitempty" db:"first_name"`
-	Email     string `json:"email,omitempty" db:"email"`
-}
-
 type UserDeleteResponse struct {
 	StatusCode     int              `json:"error_code"`
 	Message        string           `json:"error_description"`
 	BookReportList []BookReportList `json:"book_issued"`
-	DeletedUser    DeleteUser       `json:"data,omitempty"`
+	DeletedUser    User             `json:"data,omitempty"`
 }
